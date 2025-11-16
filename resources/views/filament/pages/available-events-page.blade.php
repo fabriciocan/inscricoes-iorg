@@ -35,7 +35,7 @@
 
                     @if ($event['current_price'])
                         <a href="{{ route('filament.admin.pages.registration-page', ['event' => $event['id']]) }}" 
-                           class="inline-flex items-center justify-center w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors">
+                           class="inline-flex items-center justify-center w-full px-4 py-2 bg-blue-600 hover:bg-blue-900 text-white font-semibold rounded-lg transition-colors">
                             <x-heroicon-o-pencil-square class="w-5 h-5 mr-2" />
                             Inscrever-se
                         </a>

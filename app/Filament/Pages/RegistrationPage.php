@@ -15,6 +15,12 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 
 class RegistrationPage extends Page implements HasForms, HasActions
 {
@@ -34,6 +40,8 @@ class RegistrationPage extends Page implements HasForms, HasActions
     public ?Package $package = null;
 
     public array $registrations = [];
+
+    public bool $showForm = false;
 
     public function mount(): void
     {
@@ -72,6 +80,8 @@ class RegistrationPage extends Page implements HasForms, HasActions
         // Don't create package here - it will be created when first registration is added
 
         $this->loadRegistrations();
+
+        $this->form->fill();
     }
 
     public function getTitle(): string | Htmlable
@@ -86,84 +96,316 @@ class RegistrationPage extends Page implements HasForms, HasActions
         return auth()->check();
     }
 
-    protected function getHeaderActions(): array
+    protected function getFormSchema(): array
     {
         return [
-            Action::make('addRegistration')
-                ->label('Adicionar Inscrição')
-                ->icon('heroicon-o-plus-circle')
-                ->color('success')
-                ->modalHeading('Adicionar Nova Inscrição')
-                ->modalDescription(function () {
-                    if (!$this->event) {
-                        return null;
-                    }
-                    
-                    $eventService = app(EventService::class);
-                    $currentPrice = $eventService->getCurrentPrice($this->event);
-                    
-                    return $currentPrice 
-                        ? "Valor atual: R$ " . number_format($currentPrice, 2, ',', '.')
-                        : null;
-                })
-                ->form([
-                    \Filament\Forms\Components\TextInput::make('participant_name')
-                        ->label('Nome do Participante')
-                        ->required()
-                        ->minLength(3)
-                        ->maxLength(255),
-                    
-                    \Filament\Forms\Components\TextInput::make('participant_email')
-                        ->label('Email do Participante')
-                        ->email()
-                        ->required()
-                        ->maxLength(255),
-                    
-                    \Filament\Forms\Components\TextInput::make('participant_phone')
-                        ->label('Telefone do Participante')
-                        ->tel()
-                        ->required()
-                        ->mask('(99) 99999-9999')
-                        ->maxLength(15),
-                    
-                    \Filament\Forms\Components\Textarea::make('participant_data')
-                        ->label('Informações Adicionais')
-                        ->rows(3)
-                        ->maxLength(1000),
-                ])
-                ->action(function (array $data) {
-                    try {
-                        $registrationService = app(RegistrationService::class);
-                        
-                        // Create package if it doesn't exist (only when adding first registration)
-                        if (!$this->package) {
-                            $this->package = $registrationService->createPackage(auth()->user());
-                        }
-                        
-                        $registrationService->addRegistrationToPackage(
-                            $this->package,
-                            $this->event,
-                            $data
-                        );
+                Section::make('Informações Pessoais')
+                    ->description('Dados pessoais do participante')
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('cpf')
+                                    ->label('CPF')
+                                    ->required()
+                                    ->mask('999.999.999-99')
+                                    ->placeholder('000.000.000-00')
+                                    ->maxLength(14),
 
-                        Notification::make()
-                            ->title('Inscrição adicionada com sucesso!')
-                            ->success()
-                            ->send();
-                        
-                        $this->loadRegistrations();
-                    } catch (\Exception $e) {
-                        Notification::make()
-                            ->title('Erro ao adicionar inscrição')
-                            ->body($e->getMessage())
-                            ->danger()
-                            ->send();
-                    }
-                })
-                ->modalSubmitActionLabel('Adicionar')
-                ->modalCancelActionLabel('Cancelar')
-                ->modalWidth('lg'),
-        ];
+                                TextInput::make('participant_name')
+                                    ->label('Nome Completo')
+                                    ->required()
+                                    ->columnSpan(2)
+                                    ->maxLength(255),
+                            ]),
+
+                        Grid::make(3)
+                            ->schema([
+                                DatePicker::make('birth_date')
+                                    ->label('Data de Nascimento')
+                                    ->required()
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y')
+                                    ->maxDate(now()),
+
+                                TextInput::make('participant_email')
+                                    ->label('Email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+
+                                TextInput::make('participant_phone')
+                                    ->label('Telefone')
+                                    ->tel()
+                                    ->required()
+                                    ->mask('(99) 99999-9999')
+                                    ->maxLength(15),
+                            ]),
+                    ])
+                    ->collapsible()
+                    ->columns(1),
+
+                Section::make('Assembleia e Localização')
+                    ->description('Informações sobre assembleia e cidade')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('assembleia')
+                                    ->label('Assembleia')
+                                    ->required()
+                                    ->placeholder('Selecione sua Assembleia...')
+                                    ->options([
+                                        'Assembleia Caminho de Luz Nº 1' => 'Assembleia Caminho de Luz Nº 1',
+                                        'Assembleia Pitágoras Nº 2' => 'Assembleia Pitágoras Nº 2',
+                                        'Assembleia Filhos de Hiram Nº 3' => 'Assembleia Filhos de Hiram Nº 3',
+                                        'Assembleia Acácia Nº 4' => 'Assembleia Acácia Nº 4',
+                                        'Assembleia Portal da Vida Nº 5' => 'Assembleia Portal da Vida Nº 5',
+                                        'Assembleia Divina Flor Nº 6' => 'Assembleia Divina Flor Nº 6',
+                                        'Assembleia Estrela da Paz Nº 9' => 'Assembleia Estrela da Paz Nº 9',
+                                        'Assembleia Anjos da Paz Nº 10' => 'Assembleia Anjos da Paz Nº 10',
+                                        'Assembleia Flores de Acácia Nº 11' => 'Assembleia Flores de Acácia Nº 11',
+                                        'Assembleia Lírios do Vale Nº 12' => 'Assembleia Lírios do Vale Nº 12',
+                                        'Assembleia Guardiãs da Luz Nº 13' => 'Assembleia Guardiãs da Luz Nº 13',
+                                        'Assembleia Harmonia das Cores Nº 14' => 'Assembleia Harmonia das Cores Nº 14',
+                                        'Assembleia Luz das Águas Nº 15' => 'Assembleia Luz das Águas Nº 15',
+                                        'Assembleia Rosa dos Ventos Nº 16' => 'Assembleia Rosa dos Ventos Nº 16',
+                                        'Assembleia Água Viva Nº 17' => 'Assembleia Água Viva Nº 17',
+                                        'Assembleia Guardiã das Cores Nº 18' => 'Assembleia Guardiã das Cores Nº 18',
+                                        'Assembleia Renascer Nº 19' => 'Assembleia Renascer Nº 19',
+                                        'Assembleia Luz do Oriente Nº 20' => 'Assembleia Luz do Oriente Nº 20',
+                                        'Assembleia Guardiãs do Manacá Nº 21' => 'Assembleia Guardiãs do Manacá Nº 21',
+                                        'Assembleia Flores do Pantanal Nº 22' => 'Assembleia Flores do Pantanal Nº 22',
+                                        'Assembleia Biguaçu Nº 23' => 'Assembleia Biguaçu Nº 23',
+                                        'Visitantes/Outras Jurisdições' => 'Visitantes/Outras Jurisdições',
+                                    ])
+                                    ->searchable()
+                                    ->columnSpan(2),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('estado')
+                                    ->label('Estado')
+                                    ->required()
+                                    ->maxLength(100),
+
+                                TextInput::make('cidade')
+                                    ->label('Cidade')
+                                    ->required()
+                                    ->maxLength(100),
+                            ]),
+                    ])
+                    ->collapsible()
+                    ->columns(1),
+
+                Section::make('Informações de Inscrição')
+                    ->description('Tipo de inscrição e cargo')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('tipo_inscricao')
+                                    ->label('Tipo de Inscrição')
+                                    ->required()
+                                    ->placeholder('Selecione o tipo de inscrição...')
+                                    ->options([
+                                        'Ativa' => 'Ativa',
+                                        'Maioridade' => 'Maioridade',
+                                        'Promessa' => 'Promessa',
+                                        'Tia Estrela do Oriente' => 'Tia Estrela do Oriente',
+                                        'Tia NÃO Estrela do Oriente' => 'Tia',
+                                        'Maçom' => 'Maçom',
+                                        'Tio NÃO Maçom' => 'Tio NÃO Maçom',
+                                        'Outro' => 'Outro',
+                                    ])
+                                    ->searchable()
+                                    ->live(),
+
+                                Select::make('cargo')
+                                    ->label('Qual seu cargo?')
+                                    ->required()
+                                    ->placeholder('Selecione seu cargo...')
+                                    ->options([
+                                        'Grande Cargo' => 'Grande Cargo',
+                                        'Ilustre Preceptora' => 'Ilustre Preceptora',
+                                        'Ilustre Preceptora Adjunta' => 'Ilustre Preceptora Adjunta',
+                                        'Esperança' => 'Esperança',
+                                        'Caridade' => 'Caridade',
+                                        'Fé' => 'Fé',
+                                        'Arquivista' => 'Arquivista',
+                                        'Tesoureira' => 'Tesoureira',
+                                        'Capelã' => 'Capelã',
+                                        'Chefe do Cerimonial' => 'Chefe do Cerimonial',
+                                        'Amor' => 'Amor',
+                                        'Religião' => 'Religião',
+                                        'Natureza' => 'Natureza',
+                                        'Imortalidade' => 'Imortalidade',
+                                        'Fidelidade' => 'Fidelidade',
+                                        'Patriostismo' => 'Patriostismo',
+                                        'Serviço' => 'Serviço',
+                                        'Observadora Confidencial' => 'Observadora Confidencial',
+                                        'Observadora Externa' => 'Observadora Externa',
+                                        'Música' => 'Música',
+                                        'Regente do Coro' => 'Regente do Coro',
+                                        'Coro' => 'Coro',
+                                        'Preceptora Mãe' => 'Preceptora Mãe',
+                                        'Preceptora Mãe Adjunta' => 'Preceptora Mãe Adjunta',
+                                        'Presidente do Conselho Consultivo' => 'Presidente do Conselho Consultivo',
+                                        'Membro do Conselho Consultivo' => 'Membro do Conselho Consultivo',
+                                        'Outro' => 'Outro',
+                                    ])
+                                    ->searchable()
+                                    ->live(),
+                            ]),
+
+                        TextInput::make('tipo_inscricao_outro')
+                            ->label('Especifique o tipo de inscrição')
+                            ->placeholder('Digite o tipo de inscrição...')
+                            ->maxLength(255)
+                            ->required(fn ($get) => $get('tipo_inscricao') === 'Outro')
+                            ->visible(fn ($get) => $get('tipo_inscricao') === 'Outro')
+                            ->dehydrated(fn ($get) => $get('tipo_inscricao') === 'Outro'),
+
+                        TextInput::make('cargo_outro')
+                            ->label('Especifique seu cargo')
+                            ->placeholder('Digite seu cargo...')
+                            ->maxLength(255)
+                            ->required(fn ($get) => $get('cargo') === 'Outro')
+                            ->visible(fn ($get) => $get('cargo') === 'Outro')
+                            ->dehydrated(fn ($get) => $get('cargo') === 'Outro'),
+
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('alumni')
+                                    ->label('Faz parte da Alumni?')
+                                    ->required()
+                                    ->placeholder('Selecione...')
+                                    ->options([
+                                        'Sim' => 'Sim',
+                                        'Não' => 'Não',
+                                    ]),
+
+                                Select::make('mestre_cruz')
+                                    ->label('É Mestre da Grande Cruz das Cores?')
+                                    ->required()
+                                    ->placeholder('Selecione...')
+                                    ->options([
+                                        'Sim' => 'Sim',
+                                        'Não' => 'Não',
+                                    ]),
+                            ]),
+                    ])
+                    ->collapsible()
+                    ->columns(1),
+
+                Section::make('Informações de Saúde')
+                    ->description('Alergias, medicamentos e plano de saúde')
+                    ->schema([
+                        Textarea::make('alergia')
+                            ->label('Você tem alguma alergia?')
+                            ->placeholder('Liste aqui alergias, se não possuir deixe em branco')
+                            ->rows(2)
+                            ->maxLength(500),
+
+                        Textarea::make('medicamento')
+                            ->label('Você faz uso de algum medicamento?')
+                            ->placeholder('Liste aqui medicamentos, se não utilizar deixe em branco')
+                            ->rows(2)
+                            ->maxLength(500),
+
+                        TextInput::make('plano_saude')
+                            ->label('Você tem plano de saúde?')
+                            ->placeholder('Digite aqui seu plano, se não possuir deixe em branco')
+                            ->maxLength(255),
+                    ])
+                    ->collapsible()
+                    ->columns(1),
+            ];
+    }
+
+    protected function getFormStatePath(): ?string
+    {
+        return 'data';
+    }
+
+    public function toggleForm(): void
+    {
+        $this->showForm = !$this->showForm;
+        if (!$this->showForm) {
+            $this->form->fill();
+        }
+    }
+
+    public function submitForm(): void
+    {
+        try {
+            $data = $this->form->getState();
+
+            $registrationService = app(RegistrationService::class);
+
+            // Create package if it doesn't exist (only when adding first registration)
+            if (!$this->package) {
+                $this->package = $registrationService->createPackage(auth()->user());
+            }
+
+            // Prepare participant_data as JSON with all additional fields
+            $tipoInscricao = $data['tipo_inscricao'];
+            if ($tipoInscricao === 'Outro' && isset($data['tipo_inscricao_outro'])) {
+                $tipoInscricao = $data['tipo_inscricao_outro'];
+            }
+
+            $cargo = $data['cargo'];
+            if ($cargo === 'Outro' && isset($data['cargo_outro'])) {
+                $cargo = $data['cargo_outro'];
+            }
+
+            $participantData = [
+                'cpf' => $data['cpf'],
+                'birth_date' => $data['birth_date'],
+                'assembleia' => $data['assembleia'],
+                'estado' => $data['estado'],
+                'cidade' => $data['cidade'],
+                'tipo_inscricao' => $tipoInscricao,
+                'cargo' => $cargo,
+                'alumni' => $data['alumni'],
+                'mestre_cruz' => $data['mestre_cruz'],
+                'alergia' => $data['alergia'] ?? null,
+                'medicamento' => $data['medicamento'] ?? null,
+                'plano_saude' => $data['plano_saude'] ?? null,
+            ];
+
+            // Prepare registration data
+            $registrationData = [
+                'participant_name' => $data['participant_name'],
+                'participant_email' => $data['participant_email'],
+                'participant_phone' => $data['participant_phone'],
+                'participant_data' => json_encode($participantData),
+            ];
+
+            $registrationService->addRegistrationToPackage(
+                $this->package,
+                $this->event,
+                $registrationData
+            );
+
+            Notification::make()
+                ->title('Inscrição adicionada com sucesso!')
+                ->success()
+                ->send();
+
+            $this->loadRegistrations();
+            $this->form->fill();
+            $this->showForm = false;
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Erro ao adicionar inscrição')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [];
     }
 
     public function addRegistration(): void
@@ -174,15 +416,11 @@ class RegistrationPage extends Page implements HasForms, HasActions
             'data.birth_date' => 'required|date',
             'data.participant_email' => 'required|email|max:255',
             'data.participant_phone' => 'required|string|max:15',
-            'data.assembleia' => 'required|string',
-            'data.assembleia_especificar' => 'nullable|string|max:255',
+            'data.assembleia' => 'required|string|max:255',
             'data.estado' => 'required|string|max:100',
             'data.cidade' => 'required|string|max:100',
-            'data.tipo_inscricao' => 'required|string',
-            'data.tipo_inscricao_especificar' => 'nullable|string|max:255',
-            'data.cargo' => 'required|string',
-            'data.sub_cargo' => 'nullable|string',
-            'data.cargo_outro' => 'nullable|string|max:255',
+            'data.tipo_inscricao' => 'required|string|max:255',
+            'data.cargo' => 'required|string|max:255',
             'data.alumni' => 'required|string',
             'data.mestre_cruz' => 'required|string',
             'data.alergia' => 'nullable|string|max:500',
@@ -213,18 +451,24 @@ class RegistrationPage extends Page implements HasForms, HasActions
             }
 
             // Prepare participant_data as JSON with all additional fields
+            $tipoInscricao = $this->data['tipo_inscricao'];
+            if ($tipoInscricao === 'Outro' && isset($this->data['tipo_inscricao_outro'])) {
+                $tipoInscricao = $this->data['tipo_inscricao_outro'];
+            }
+
+            $cargo = $this->data['cargo'];
+            if ($cargo === 'Outro' && isset($this->data['cargo_outro'])) {
+                $cargo = $this->data['cargo_outro'];
+            }
+
             $participantData = [
                 'cpf' => $this->data['cpf'],
                 'birth_date' => $this->data['birth_date'],
                 'assembleia' => $this->data['assembleia'],
-                'assembleia_especificar' => $this->data['assembleia_especificar'] ?? null,
                 'estado' => $this->data['estado'],
                 'cidade' => $this->data['cidade'],
-                'tipo_inscricao' => $this->data['tipo_inscricao'],
-                'tipo_inscricao_especificar' => $this->data['tipo_inscricao_especificar'] ?? null,
-                'cargo' => $this->data['cargo'],
-                'sub_cargo' => $this->data['sub_cargo'] ?? null,
-                'cargo_outro' => $this->data['cargo_outro'] ?? null,
+                'tipo_inscricao' => $tipoInscricao,
+                'cargo' => $cargo,
                 'alumni' => $this->data['alumni'],
                 'mestre_cruz' => $this->data['mestre_cruz'],
                 'alergia' => $this->data['alergia'] ?? null,

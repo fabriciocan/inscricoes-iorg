@@ -26,19 +26,64 @@
         </div>
     @endif
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-        <div class="flex items-center justify-between">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                    Adicionar Inscrição
+    @if ($showForm)
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                    Nova Inscrição
                 </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Clique no botão abaixo para adicionar uma nova inscrição ao evento
-                </p>
+                <x-filament::button
+                    color="gray"
+                    size="sm"
+                    wire:click="toggleForm"
+                >
+                    Cancelar
+                </x-filament::button>
             </div>
-            {{ ($this->addRegistrationAction)(['event_id' => $event->id, 'package_id' => $package?->id]) }}
+
+            <form wire:submit="submitForm" class="space-y-6">
+                {{ $this->form }}
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <x-filament::button
+                        type="button"
+                        color="gray"
+                        wire:click="toggleForm"
+                    >
+                        Cancelar
+                    </x-filament::button>
+                    <x-filament::button
+                        type="submit"
+                        color="success"
+                        size="lg"
+                    >
+                        <x-heroicon-o-plus-circle class="w-5 h-5 mr-2" />
+                        Adicionar Inscrição
+                    </x-filament::button>
+                </div>
+            </form>
         </div>
-    </div>
+    @else
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                        Adicionar Nova Inscrição
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Preencha o formulário com os dados do participante
+                    </p>
+                </div>
+                <x-filament::button
+                    color="success"
+                    icon="heroicon-o-plus-circle"
+                    wire:click="toggleForm"
+                >
+                    Nova Inscrição
+                </x-filament::button>
+            </div>
+        </div>
+    @endif
 
     @if (!empty($registrations))
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
@@ -117,6 +162,4 @@
             Número do Pacote: <span class="font-mono font-semibold">{{ $package->package_number }}</span>
         </div>
     @endif
-
-    <x-filament-actions::modals />
 </div>

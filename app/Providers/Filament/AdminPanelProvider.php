@@ -59,6 +59,6 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 'panels::styles.after',
                 fn () => view('filament.hooks.custom-styles')
-            );
+            )->spa();
     }
 }

@@ -79,13 +79,17 @@ class MyRegistrationsPage extends Page implements HasForms, HasTable
                     ->badge()
                     ->color('info'),
 
-                TextColumn::make('registrations.event.name')
+                TextColumn::make('event_name')
                     ->label('Evento')
                     ->limit(30)
-                    ->searchable()
-                    ->formatStateUsing(function (Package $record) {
-                        $events = $record->registrations->pluck('event.name')->unique();
-                        return $events->join(', ');
+                    ->getStateUsing(function (Package $record) {
+                        // Pega apenas o evento da primeira inscrição
+                        return $record->registrations->first()?->event?->name ?? '-';
+                    })
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('registrations.event', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
                     }),
 
                 TextColumn::make('total_amount')
@@ -111,16 +115,6 @@ class MyRegistrationsPage extends Page implements HasForms, HasTable
                         default => $state,
                     })
                     ->sortable(),
-
-                TextColumn::make('payment_method')
-                    ->label('Método de Pagamento')
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'pix' => 'PIX',
-                        'credit_card' => 'Cartão de Crédito',
-                        null => '-',
-                        default => $state,
-                    })
-                    ->placeholder('-'),
 
                 TextColumn::make('created_at')
                     ->label('Data de Criação')
