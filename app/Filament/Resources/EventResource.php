@@ -66,6 +66,11 @@ class EventResource extends Resource
                             ->columnSpanFull()
                             ->placeholder('Descreva o evento em detalhes'),
 
+                        Forms\Components\ViewField::make('logo_preview')
+                            ->label('Logo do Evento')
+                            ->view('filament.forms.components.logo-preview')
+                            ->columnSpanFull(),
+
                         Forms\Components\DateTimePicker::make('event_date')
                             ->label('Data do Evento')
                             ->required()
@@ -90,26 +95,32 @@ class EventResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('logo')
+                    ->label('Logo')
+                    ->getStateUsing(fn ($record) => $record->logo ? asset('storage/' . $record->logo) : url('/images/default-event-logo.png'))
+                    ->circular()
+                    ->size(50),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nome')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('event_date')
                     ->label('Data do Evento')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
-                
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Ativo')
                     ->boolean()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('registrations_count')
                     ->label('Inscrições')
                     ->counts('registrations')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Criado em')
                     ->dateTime('d/m/Y H:i')

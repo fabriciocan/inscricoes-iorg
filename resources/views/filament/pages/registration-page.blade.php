@@ -1,24 +1,24 @@
-<div class="space-y-6">
+<div class="space-y-6 mt-10">
     @if ($event)
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-start justify-between">
                 <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">
                         {{ $event->name }}
                     </h2>
-                    <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600 mb-3">
                         <div class="flex items-center gap-2">
                             <x-heroicon-o-calendar class="w-4 h-4" />
                             <span>{{ $event->event_date->format('d/m/Y H:i') }}</span>
                         </div>
                     </div>
-                    <p class="text-gray-700 dark:text-gray-300">
+                    <p class="text-gray-700">
                         {{ $event->description }}
                     </p>
                 </div>
                 <div class="ml-6 text-right">
-                    <span class="text-sm text-gray-600 dark:text-gray-400 block mb-1">Preço por inscrição:</span>
-                    <span class="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                    <span class="text-sm text-gray-600 block mb-1">Preço por inscrição:</span>
+                    <span class="text-3xl font-bold text-primary-600">
                         R$ {{ number_format($this->getCurrentPrice() ?? 0, 2, ',', '.') }}
                     </span>
                 </div>
@@ -27,9 +27,9 @@
     @endif
 
     @if ($showForm)
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                <h3 class="text-xl font-bold text-gray-900">
                     Nova Inscrição
                 </h3>
                 <x-filament::button
@@ -64,13 +64,13 @@
             </form>
         </div>
     @else
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">
                         Adicionar Nova Inscrição
                     </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <p class="text-sm text-gray-600">
                         Preencha o formulário com os dados do participante
                     </p>
                 </div>
@@ -86,14 +86,14 @@
     @endif
 
     @if (!empty($registrations))
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 class="text-lg font-semibold text-gray-900">
                     Inscrições Adicionadas ({{ count($registrations) }})
                 </h3>
                 <div class="text-right">
-                    <span class="text-sm text-gray-600 dark:text-gray-400 block">Total:</span>
-                    <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    <span class="text-sm text-gray-600 block">Total:</span>
+                    <span class="text-2xl font-bold text-primary-600">
                         R$ {{ number_format($this->getPackageTotal(), 2, ',', '.') }}
                     </span>
                 </div>
@@ -101,12 +101,12 @@
 
             <div class="space-y-3">
                 @foreach ($registrations as $registration)
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                         <div class="flex-1">
-                            <div class="font-semibold text-gray-900 dark:text-white">
+                            <div class="font-semibold text-gray-900">
                                 {{ $registration['participant_name'] }}
                             </div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <div class="text-sm text-gray-600 mt-1">
                                 <span class="inline-flex items-center gap-1">
                                     <x-heroicon-o-envelope class="w-4 h-4" />
                                     {{ $registration['participant_email'] }}
@@ -119,7 +119,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-4 ml-4">
-                            <span class="text-lg font-semibold text-gray-900 dark:text-white">
+                            <span class="text-lg font-semibold text-gray-900">
                                 R$ {{ number_format($registration['price_paid'], 2, ',', '.') }}
                             </span>
                             <x-filament::button
@@ -146,19 +146,19 @@
             </div>
         </div>
     @else
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center border border-gray-200 dark:border-gray-700">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center border border-gray-200">
             <x-heroicon-o-user-group class="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">
                 Nenhuma inscrição adicionada
             </h3>
-            <p class="text-gray-600 dark:text-gray-400">
+            <p class="text-gray-600">
                 Clique no botão acima para adicionar sua primeira inscrição.
             </p>
         </div>
     @endif
 
     @if ($package)
-        <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+        <div class="text-center text-sm text-gray-500">
             Número do Pacote: <span class="font-mono font-semibold">{{ $package->package_number }}</span>
         </div>
     @endif

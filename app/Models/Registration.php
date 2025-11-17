@@ -31,6 +31,7 @@ class Registration extends Model
     {
         return [
             'price_paid' => 'decimal:2',
+            'participant_data' => 'array',
         ];
     }
 

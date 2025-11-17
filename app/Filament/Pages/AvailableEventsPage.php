@@ -53,6 +53,7 @@ class AvailableEventsPage extends Page
                 'id' => $event->id,
                 'name' => $event->name,
                 'description' => $event->description,
+                'logo' => $event->logo,
                 'event_date' => $event->event_date,
                 'current_price' => $eventService->getCurrentPrice($event),
             ];
