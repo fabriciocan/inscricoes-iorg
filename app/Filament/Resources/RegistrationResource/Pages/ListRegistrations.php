@@ -43,11 +43,9 @@ class ListRegistrations extends ListRecords
                             Column::make('participant_data.cidade')->heading('Cidade'),
                             Column::make('participant_data.tipo_inscricao')->heading('Tipo de Inscrição'),
                             Column::make('participant_data.cargo')->heading('Cargo'),
-                            Column::make('participant_data.alumni')->heading('Alumni'),
-                            Column::make('participant_data.mestre_cruz')->heading('Mestre da Grande Cruz'),
-                            Column::make('participant_data.alergia')->heading('Alergias'),
-                            Column::make('participant_data.medicamento')->heading('Medicamentos'),
-                            Column::make('participant_data.plano_saude')->heading('Plano de Saúde'),
+                            Column::make('participant_data.mestre_cruz')->heading('Mestre da Grande Cruz das Cores'),
+                            Column::make('participant_data.refeicao_especial')->heading('Refeição Especial'),
+                            Column::make('participant_data.qual_refeicao_especial')->heading('Qual Refeição Especial'),
                             Column::make('package.status')
                                 ->heading('Status')
                                 ->formatStateUsing(fn (string $state): string => match ($state) {

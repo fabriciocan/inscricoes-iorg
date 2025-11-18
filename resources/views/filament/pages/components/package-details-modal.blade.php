@@ -150,10 +150,88 @@
                             </div>
 
                             @if ($registration->participant_data)
-                                <div class="mt-3 p-3 bg-gray-50 rounded text-sm text-gray-700">
-                                    <span class="font-medium text-gray-900">Informações Adicionais:</span>
-                                    <div class="mt-1">{{ $registration->participant_data }}</div>
-                                </div>
+                                @php
+                                    $participantData = is_string($registration->participant_data)
+                                        ? json_decode($registration->participant_data, true)
+                                        : $registration->participant_data;
+                                @endphp
+
+                                @if ($participantData)
+                                    <div class="mt-3 p-3 bg-gray-50 rounded text-sm">
+                                        <span class="font-medium text-gray-900 block mb-2">Informações Adicionais:</span>
+                                        <div class="grid grid-cols-2 gap-2 text-gray-700">
+                                            @if (isset($participantData['cpf']))
+                                                <div>
+                                                    <span class="font-medium">CPF:</span>
+                                                    <span>{{ $participantData['cpf'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['birth_date']))
+                                                <div>
+                                                    <span class="font-medium">Data de Nascimento:</span>
+                                                    <span>{{ \Carbon\Carbon::parse($participantData['birth_date'])->format('d/m/Y') }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['assembleia']))
+                                                <div class="col-span-2">
+                                                    <span class="font-medium">Assembleia:</span>
+                                                    <span>{{ $participantData['assembleia'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['estado']))
+                                                <div>
+                                                    <span class="font-medium">Estado:</span>
+                                                    <span>{{ $participantData['estado'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['cidade']))
+                                                <div>
+                                                    <span class="font-medium">Cidade:</span>
+                                                    <span>{{ $participantData['cidade'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['tipo_inscricao']))
+                                                <div class="col-span-2">
+                                                    <span class="font-medium">Tipo de Inscrição:</span>
+                                                    <span>{{ $participantData['tipo_inscricao'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['cargo']))
+                                                <div class="col-span-2">
+                                                    <span class="font-medium">Cargo:</span>
+                                                    <span>{{ $participantData['cargo'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['mestre_cruz']))
+                                                <div class="col-span-2">
+                                                    <span class="font-medium">Mestre da Grande Cruz das Cores:</span>
+                                                    <span>{{ $participantData['mestre_cruz'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['refeicao_especial']))
+                                                <div class="col-span-2">
+                                                    <span class="font-medium">Refeição Especial:</span>
+                                                    <span>{{ $participantData['refeicao_especial'] }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if (isset($participantData['qual_refeicao_especial']) && $participantData['qual_refeicao_especial'])
+                                                <div class="col-span-2">
+                                                    <span class="font-medium">Qual Refeição Especial:</span>
+                                                    <span>{{ $participantData['qual_refeicao_especial'] }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                         </div>
 
