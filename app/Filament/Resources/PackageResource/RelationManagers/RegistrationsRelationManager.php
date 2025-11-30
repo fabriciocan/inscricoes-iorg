@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\PackageResource\RelationManagers;
 
+use App\Filament\Resources\RegistrationResource;
 use App\Services\RegistrationService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -71,6 +73,10 @@ class RegistrationsRelationManager extends RelationManager
                 // No create or associate actions - registrations are created through the registration flow
             ])
             ->recordActions([
+                ViewAction::make()
+                    ->label('Ver')
+                    ->url(fn ($record): string => RegistrationResource::getUrl('view', ['record' => $record])),
+
                 DeleteAction::make()
                     ->label('Remover')
                     ->modalHeading('Remover Inscrição do Pacote')

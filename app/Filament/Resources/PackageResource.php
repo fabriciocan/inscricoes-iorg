@@ -265,30 +265,6 @@ class PackageResource extends Resource
                     ])
                     ->columns(1),
 
-                Section::make('Inscrições')
-                    ->schema([
-                        Infolists\Components\RepeatableEntry::make('registrations')
-                            ->label('')
-                            ->schema([
-                                Infolists\Components\TextEntry::make('event.name')
-                                    ->label('Evento'),
-
-                                Infolists\Components\TextEntry::make('participant_name')
-                                    ->label('Participante'),
-
-                                Infolists\Components\TextEntry::make('participant_email')
-                                    ->label('Email')
-                                    ->copyable(),
-
-                                Infolists\Components\TextEntry::make('participant_phone')
-                                    ->label('Telefone'),
-
-                                Infolists\Components\TextEntry::make('price_paid')
-                                    ->label('Valor Pago')
-                                    ->money('BRL'),
-                            ])
-                            ->columns(1),
-                    ]),
             ])
             ->columns(1);
     }

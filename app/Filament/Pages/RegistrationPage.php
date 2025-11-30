@@ -356,7 +356,82 @@ class RegistrationPage extends Page implements HasForms, HasActions
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            Action::make('addRegistration')
+                ->label('Adicionar Inscrição')
+                ->icon('heroicon-o-plus-circle')
+                ->color('success')
+                ->modalHeading('Adicionar Nova Inscrição')
+                ->modalDescription(function () {
+                    if (!$this->event) {
+                        return null;
+                    }
+                    
+                    $eventService = app(EventService::class);
+                    $currentPrice = $eventService->getCurrentPrice($this->event);
+                    
+                    return $currentPrice 
+                        ? "Valor atual: R$ " . number_format($currentPrice, 2, ',', '.')
+                        : null;
+                })
+                ->form([
+                    \Filament\Forms\Components\TextInput::make('participant_name')
+                        ->label('Nome do Participante')
+                        ->required()
+                        ->minLength(3)
+                        ->maxLength(255),
+                    
+                    \Filament\Forms\Components\TextInput::make('participant_email')
+                        ->label('Email do Participante')
+                        ->email()
+                        ->required()
+                        ->maxLength(255),
+                    
+                    \Filament\Forms\Components\TextInput::make('participant_phone')
+                        ->label('Telefone do Participante')
+                        ->tel()
+                        ->required()
+                        ->mask('(99) 99999-9999')
+                        ->maxLength(15),
+                    
+                    \Filament\Forms\Components\Textarea::make('participant_data')
+                        ->label('Informações Adicionais')
+                        ->rows(3)
+                        ->maxLength(1000),
+                ])
+                ->action(function (array $data) {
+                    try {
+                        $registrationService = app(RegistrationService::class);
+                        
+                        // Create package if it doesn't exist (only when adding first registration)
+                        if (!$this->package) {
+                            $this->package = $registrationService->createPackage(auth()->user());
+                        }
+                        
+                        $registrationService->addRegistrationToPackage(
+                            $this->package,
+                            $this->event,
+                            $data
+                        );
+
+                        Notification::make()
+                            ->title('Inscrição adicionada com sucesso!')
+                            ->success()
+                            ->send();
+                        
+                        $this->loadRegistrations();
+                    } catch (\Exception $e) {
+                        Notification::make()
+                            ->title('Erro ao adicionar inscrição')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
+                })
+                ->modalSubmitActionLabel('Adicionar')
+                ->modalCancelActionLabel('Cancelar')
+                ->modalWidth('lg'),
+        ];
     }
 
     public function addRegistration(): void

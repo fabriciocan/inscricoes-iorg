@@ -9,6 +9,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -50,6 +51,7 @@ class RegistrationResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->schema([
                 Section::make('Informações do Evento')
                     ->schema([
@@ -105,7 +107,9 @@ class RegistrationResource extends Resource
                         Forms\Components\Select::make('participant_data.assembleia')
                             ->label('Assembleia')
                             ->options([
-                                'Assembleia Caminho de Luz Nº 1' => 'Assembleia Caminho de Luz Nº 1',
+                                'Assembleia Caminhos de Luz Nº 1' => 'Assembleia Caminhos de Luz Nº 1',
+                                'Assembleia Flores do Pantanal Nº 1' => 'Assembleia Flores do Pantanal Nº 1',
+                                'Assembleia Biguaçu Nº 1' => 'Assembleia Biguaçu Nº 1',
                                 'Assembleia Pitágoras Nº 2' => 'Assembleia Pitágoras Nº 2',
                                 'Assembleia Filhos de Hiram Nº 3' => 'Assembleia Filhos de Hiram Nº 3',
                                 'Assembleia Acácia Nº 4' => 'Assembleia Acácia Nº 4',
@@ -124,12 +128,11 @@ class RegistrationResource extends Resource
                                 'Assembleia Renascer Nº 19' => 'Assembleia Renascer Nº 19',
                                 'Assembleia Luz do Oriente Nº 20' => 'Assembleia Luz do Oriente Nº 20',
                                 'Assembleia Guardiãs do Manacá Nº 21' => 'Assembleia Guardiãs do Manacá Nº 21',
-                                'Assembleia Flores do Pantanal Nº 22' => 'Assembleia Flores do Pantanal Nº 22',
-                                'Assembleia Biguaçu Nº 23' => 'Assembleia Biguaçu Nº 23',
+                                'Assembleia Aliança Ibiporã Nº 22' => 'Assembleia Aliança Ibiporã Nº 22',
+                                'Assembleia Filhas da Luz Nº 23' => 'Assembleia Filhas da Luz Nº 23',
                                 'Visitantes/Outras Jurisdições' => 'Visitantes/Outras Jurisdições',
                             ])
-                            ->searchable()
-                            ->columnSpan(2),
+                            ->searchable(),
 
                         Forms\Components\TextInput::make('participant_data.estado')
                             ->label('Estado')
@@ -142,81 +145,37 @@ class RegistrationResource extends Resource
                         Forms\Components\Select::make('participant_data.tipo_inscricao')
                             ->label('Tipo de Inscrição')
                             ->options([
-                                'Ativa' => 'Ativa',
+                                'Arco-íris Ativa' => 'Arco-íris Ativa',
                                 'Maioridade' => 'Maioridade',
-                                'Promessa' => 'Promessa',
+                                'Menina Promessa do Arco-íris' => 'Menina Promessa do Arco-íris',
                                 'Tia Estrela do Oriente' => 'Tia Estrela do Oriente',
-                                'Tia NÃO Estrela do Oriente' => 'Tia',
-                                'Maçom' => 'Maçom',
-                                'Tio NÃO Maçom' => 'Tio NÃO Maçom',
+                                'Tia não iniciada na Estrela do Oriente' => 'Tia não iniciada na Estrela do Oriente',
+                                'Tio Maçom' => 'Tio Maçom',
+                                'Tio não iniciado na Maçonaria' => 'Tio não iniciado na Maçonaria',
                             ])
                             ->searchable(),
 
-                        Forms\Components\Select::make('participant_data.cargo')
+                        Forms\Components\TextInput::make('participant_data.cargo')
                             ->label('Cargo')
-                            ->options([
-                                'Grande Cargo' => 'Grande Cargo',
-                                'Ilustre Preceptora' => 'Ilustre Preceptora',
-                                'Ilustre Preceptora Adjunta' => 'Ilustre Preceptora Adjunta',
-                                'Esperança' => 'Esperança',
-                                'Caridade' => 'Caridade',
-                                'Fé' => 'Fé',
-                                'Arquivista' => 'Arquivista',
-                                'Tesoureira' => 'Tesoureira',
-                                'Capelã' => 'Capelã',
-                                'Chefe do Cerimonial' => 'Chefe do Cerimonial',
-                                'Amor' => 'Amor',
-                                'Religião' => 'Religião',
-                                'Natureza' => 'Natureza',
-                                'Imortalidade' => 'Imortalidade',
-                                'Fidelidade' => 'Fidelidade',
-                                'Patriostismo' => 'Patriostismo',
-                                'Serviço' => 'Serviço',
-                                'Observadora Confidencial' => 'Observadora Confidencial',
-                                'Observadora Externa' => 'Observadora Externa',
-                                'Música' => 'Música',
-                                'Regente do Coro' => 'Regente do Coro',
-                                'Coro' => 'Coro',
-                                'Preceptora Mãe' => 'Preceptora Mãe',
-                                'Preceptora Mãe Adjunta' => 'Preceptora Mãe Adjunta',
-                                'Presidente do Conselho Consultivo' => 'Presidente do Conselho Consultivo',
-                                'Membro do Conselho Consultivo' => 'Membro do Conselho Consultivo',
-                            ])
-                            ->searchable(),
-
-                        Forms\Components\Select::make('participant_data.alumni')
-                            ->label('Alumni')
-                            ->options([
-                                'Sim' => 'Sim',
-                                'Não' => 'Não',
-                            ]),
+                            ->maxLength(255),
 
                         Forms\Components\Select::make('participant_data.mestre_cruz')
-                            ->label('Mestre da Grande Cruz')
+                            ->label('Mestre da Grande Cruz das Cores')
                             ->options([
                                 'Sim' => 'Sim',
                                 'Não' => 'Não',
                             ]),
-                    ])
-                    ->columns(2)
-                    ->collapsed(),
 
-                Section::make('Informações de Saúde')
-                    ->schema([
-                        Forms\Components\Textarea::make('participant_data.alergia')
-                            ->label('Alergias')
-                            ->rows(2)
-                            ->maxLength(500),
+                        Forms\Components\Select::make('participant_data.refeicao_especial')
+                            ->label('Refeição Especial')
+                            ->options([
+                                'Sim' => 'Sim',
+                                'Não' => 'Não',
+                            ]),
 
-                        Forms\Components\Textarea::make('participant_data.medicamento')
-                            ->label('Medicamentos')
-                            ->rows(2)
-                            ->maxLength(500),
-
-                        Forms\Components\Textarea::make('participant_data.plano_saude')
-                            ->label('Plano de Saúde')
-                            ->rows(2)
-                            ->maxLength(500),
+                        Forms\Components\TextInput::make('participant_data.qual_refeicao_especial')
+                            ->label('Qual Refeição Especial')
+                            ->maxLength(255),
                     ])
                     ->columns(1)
                     ->collapsed(),
@@ -230,6 +189,175 @@ class RegistrationResource extends Resource
                             ->prefix('R$')
                             ->minValue(0)
                             ->step(0.01),
+                    ])
+                    ->columns(1),
+            ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->columns(1)
+            ->schema([
+                Section::make('Informações do Evento')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('event.name')
+                            ->label('Evento'),
+
+                        Infolists\Components\TextEntry::make('package.package_number')
+                            ->label('Pacote')
+                            ->copyable(),
+                    ])
+                    ->columns(1),
+
+                Section::make('Dados do Participante')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('participant_name')
+                            ->label('Nome'),
+
+                        Infolists\Components\TextEntry::make('participant_email')
+                            ->label('Email')
+                            ->copyable(),
+
+                        Infolists\Components\TextEntry::make('participant_phone')
+                            ->label('Telefone'),
+                    ])
+                    ->columns(1),
+
+                Section::make('Informações Detalhadas')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('cpf')
+                            ->label('CPF')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['cpf'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('birth_date')
+                            ->label('Data de Nascimento')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return isset($data['birth_date'])
+                                    ? \Carbon\Carbon::parse($data['birth_date'])->format('d/m/Y')
+                                    : '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('assembleia')
+                            ->label('Assembleia')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['assembleia'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('estado')
+                            ->label('Estado')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['estado'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('cidade')
+                            ->label('Cidade')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['cidade'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('tipo_inscricao')
+                            ->label('Tipo de Inscrição')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['tipo_inscricao'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('cargo')
+                            ->label('Cargo')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['cargo'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('mestre_cruz')
+                            ->label('Mestre da Grande Cruz das Cores')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['mestre_cruz'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('refeicao_especial')
+                            ->label('Refeição Especial')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['refeicao_especial'] ?? '-';
+                            }),
+
+                        Infolists\Components\TextEntry::make('qual_refeicao_especial')
+                            ->label('Qual Refeição Especial')
+                            ->state(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return $data['qual_refeicao_especial'] ?? '-';
+                            })
+                            ->visible(function ($record) {
+                                $data = is_string($record->participant_data)
+                                    ? json_decode($record->participant_data, true)
+                                    : $record->participant_data;
+                                return !empty($data['qual_refeicao_especial'] ?? null);
+                            }),
+                    ])
+                    ->columns(1)
+                    ->collapsed(),
+
+                Section::make('Informações de Pagamento')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('package.status')
+                            ->label('Status')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'draft' => 'gray',
+                                'pending' => 'warning',
+                                'confirmed' => 'success',
+                                'cancelled' => 'danger',
+                                default => 'gray',
+                            })
+                            ->formatStateUsing(fn (string $state): string => match ($state) {
+                                'draft' => 'Rascunho',
+                                'pending' => 'Pendente',
+                                'confirmed' => 'Confirmado',
+                                'cancelled' => 'Cancelado',
+                                default => $state,
+                            }),
+
+                        Infolists\Components\TextEntry::make('price_paid')
+                            ->label('Valor Pago')
+                            ->money('BRL'),
+
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->label('Data de Inscrição')
+                            ->dateTime('d/m/Y H:i'),
+
+                        Infolists\Components\TextEntry::make('updated_at')
+                            ->label('Última Atualização')
+                            ->dateTime('d/m/Y H:i'),
                     ])
                     ->columns(1),
             ]);
@@ -373,7 +501,9 @@ class RegistrationResource extends Resource
                 Tables\Filters\SelectFilter::make('assembleia')
                     ->label('Assembleia')
                     ->options([
-                        'Assembleia Caminho de Luz Nº 1' => 'Assembleia Caminho de Luz Nº 1',
+                        'Assembleia Caminhos de Luz Nº 1' => 'Assembleia Caminhos de Luz Nº 1',
+                        'Assembleia Flores do Pantanal Nº 1' => 'Assembleia Flores do Pantanal Nº 1',
+                        'Assembleia Biguaçu Nº 1' => 'Assembleia Biguaçu Nº 1',
                         'Assembleia Pitágoras Nº 2' => 'Assembleia Pitágoras Nº 2',
                         'Assembleia Filhos de Hiram Nº 3' => 'Assembleia Filhos de Hiram Nº 3',
                         'Assembleia Acácia Nº 4' => 'Assembleia Acácia Nº 4',
@@ -392,9 +522,9 @@ class RegistrationResource extends Resource
                         'Assembleia Renascer Nº 19' => 'Assembleia Renascer Nº 19',
                         'Assembleia Luz do Oriente Nº 20' => 'Assembleia Luz do Oriente Nº 20',
                         'Assembleia Guardiãs do Manacá Nº 21' => 'Assembleia Guardiãs do Manacá Nº 21',
-                        'Assembleia Flores do Pantanal Nº 22' => 'Assembleia Flores do Pantanal Nº 22',
-                        'Assembleia Biguaçu Nº 23' => 'Assembleia Biguaçu Nº 23',
-                        '24' => 'Visitantes/Outras Jurisdições',
+                        'Assembleia Aliança Ibiporã Nº 22' => 'Assembleia Aliança Ibiporã Nº 22',
+                        'Assembleia Filhas da Luz Nº 23' => 'Assembleia Filhas da Luz Nº 23',
+                        'Visitantes/Outras Jurisdições' => 'Visitantes/Outras Jurisdições',
                     ])
                     ->searchable()
                     ->query(function (Builder $query, array $data) {
@@ -430,13 +560,13 @@ class RegistrationResource extends Resource
                 Tables\Filters\SelectFilter::make('tipo_inscricao')
                     ->label('Tipo de Inscrição')
                     ->options([
-                        'Ativa' => 'Ativa',
+                        'Arco-íris Ativa' => 'Arco-íris Ativa',
                         'Maioridade' => 'Maioridade',
-                        'Promessa' => 'Promessa',
+                        'Menina Promessa do Arco-íris' => 'Menina Promessa do Arco-íris',
                         'Tia Estrela do Oriente' => 'Tia Estrela do Oriente',
-                        'Tia NÃO Estrela do Oriente' => 'Tia',
-                        'Maçom' => 'Maçom',
-                        'Tio NÃO Maçom' => 'Tio NÃO Maçom',
+                        'Tia não iniciada na Estrela do Oriente' => 'Tia não iniciada na Estrela do Oriente',
+                        'Tio Maçom' => 'Tio Maçom',
+                        'Tio não iniciado na Maçonaria' => 'Tio não iniciado na Maçonaria',
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
@@ -444,57 +574,20 @@ class RegistrationResource extends Resource
                         }
                     }),
 
-                Tables\Filters\SelectFilter::make('cargo')
-                    ->label('Cargo')
-                    ->options([
-                        'Grande Cargo' => 'Grande Cargo',
-                        'Ilustre Preceptora' => 'Ilustre Preceptora',
-                        'Ilustre Preceptora Adjunta' => 'Ilustre Preceptora Adjunta',
-                        'Esperança' => 'Esperança',
-                        'Caridade' => 'Caridade',
-                        'Fé' => 'Fé',
-                        'Arquivista' => 'Arquivista',
-                        'Tesoureira' => 'Tesoureira',
-                        'Capelã' => 'Capelã',
-                        'Chefe do Cerimonial' => 'Chefe do Cerimonial',
-                        'Amor' => 'Amor',
-                        'Religião' => 'Religião',
-                        'Natureza' => 'Natureza',
-                        'Imortalidade' => 'Imortalidade',
-                        'Fidelidade' => 'Fidelidade',
-                        'Patriostismo' => 'Patriostismo',
-                        'Serviço' => 'Serviço',
-                        'Observadora Confidencial' => 'Observadora Confidencial',
-                        'Observadora Externa' => 'Observadora Externa',
-                        'Música' => 'Música',
-                        'Regente do Coro' => 'Regente do Coro',
-                        'Coro' => 'Coro',
-                        'Preceptora Mãe' => 'Preceptora Mãe',
-                        'Preceptora Mãe Adjunta' => 'Preceptora Mãe Adjunta',
-                        'Presidente do Conselho Consultivo' => 'Presidente do Conselho Consultivo',
-                        'Membro do Conselho Consultivo' => 'Membro do Conselho Consultivo',
+                Tables\Filters\Filter::make('cargo')
+                    ->form([
+                        Forms\Components\TextInput::make('cargo')
+                            ->label('Cargo'),
                     ])
-                    ->searchable()
-                    ->query(function (Builder $query, array $data) {
-                        if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.cargo') = ?", [$data['value']]);
-                        }
-                    }),
-
-                Tables\Filters\SelectFilter::make('alumni')
-                    ->label('Alumni')
-                    ->options([
-                        'Sim' => 'Sim',
-                        'Não' => 'Não',
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.alumni') = ?", [$data['value']]);
-                        }
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['cargo'],
+                            fn (Builder $query, $cargo): Builder => $query->whereRaw("JSON_EXTRACT(participant_data, '$.cargo') LIKE ?", ["%{$cargo}%"])
+                        );
                     }),
 
                 Tables\Filters\SelectFilter::make('mestre_cruz')
-                    ->label('Mestre da Grande Cruz')
+                    ->label('Mestre da Grande Cruz das Cores')
                     ->options([
                         'Sim' => 'Sim',
                         'Não' => 'Não',
@@ -502,6 +595,18 @@ class RegistrationResource extends Resource
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
                             $query->whereRaw("JSON_EXTRACT(participant_data, '$.mestre_cruz') = ?", [$data['value']]);
+                        }
+                    }),
+
+                Tables\Filters\SelectFilter::make('refeicao_especial')
+                    ->label('Refeição Especial')
+                    ->options([
+                        'Sim' => 'Sim',
+                        'Não' => 'Não',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (isset($data['value'])) {
+                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.refeicao_especial') = ?", [$data['value']]);
                         }
                     }),
             ])
@@ -533,11 +638,9 @@ class RegistrationResource extends Resource
                                 Column::make('participant_data.cidade')->heading('Cidade'),
                                 Column::make('participant_data.tipo_inscricao')->heading('Tipo de Inscrição'),
                                 Column::make('participant_data.cargo')->heading('Cargo'),
-                                Column::make('participant_data.alumni')->heading('Alumni'),
-                                Column::make('participant_data.mestre_cruz')->heading('Mestre da Grande Cruz'),
-                                Column::make('participant_data.alergia')->heading('Alergias'),
-                                Column::make('participant_data.medicamento')->heading('Medicamentos'),
-                                Column::make('participant_data.plano_saude')->heading('Plano de Saúde'),
+                                Column::make('participant_data.mestre_cruz')->heading('Mestre da Grande Cruz das Cores'),
+                                Column::make('participant_data.refeicao_especial')->heading('Refeição Especial'),
+                                Column::make('participant_data.qual_refeicao_especial')->heading('Qual Refeição Especial'),
                                 Column::make('package.status')
                                     ->heading('Status')
                                     ->formatStateUsing(fn (string $state): string => match ($state) {
