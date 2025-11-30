@@ -75,6 +75,7 @@
                     wire:click="upload"
                     wire:loading.attr="disabled"
                     wire:target="upload"
+                    @if(!$logo) disabled @endif
                     class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 <span wire:loading.remove wire:target="upload">Fazer Upload da Logo</span>
                 <span wire:loading wire:target="upload">Fazendo upload...</span>

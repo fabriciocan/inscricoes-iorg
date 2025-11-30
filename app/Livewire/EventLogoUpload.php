@@ -30,6 +30,13 @@ class EventLogoUpload extends Component
 
     public function upload()
     {
+        // Verifica se há arquivo antes de validar
+        if (!$this->logo) {
+            $this->error = 'Por favor, selecione um arquivo antes de fazer upload.';
+            $this->message = '';
+            return;
+        }
+
         $this->validate([
             'logo' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
