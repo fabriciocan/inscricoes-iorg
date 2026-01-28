@@ -35,12 +35,12 @@ class AvailableEventsPage extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return auth()->check() && !auth()->user()->isHotel();
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->check() && !auth()->user()->isAdmin();
+        return auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isHotel();
     }
 
     public function getEvents()
@@ -49,13 +49,17 @@ class AvailableEventsPage extends Page
         $events = $eventService->getActiveEvents();
 
         return $events->map(function ($event) use ($eventService) {
+            $prices = $eventService->getCurrentPrices($event);
+
             return [
                 'id' => $event->id,
                 'name' => $event->name,
                 'description' => $event->description,
                 'logo' => $event->logo,
                 'event_date' => $event->event_date,
-                'current_price' => $eventService->getCurrentPrice($event),
+                'current_price' => $prices ? $prices['pix'] : null, // Keep for backward compatibility
+                'price_card' => $prices ? $prices['card'] : null,
+                'price_pix' => $prices ? $prices['pix'] : null,
             ];
         });
     }

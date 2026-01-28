@@ -107,9 +107,9 @@ class RegistrationResource extends Resource
                         Forms\Components\Select::make('participant_data.assembleia')
                             ->label('Assembleia')
                             ->options([
-                                'Assembleia Caminhos de Luz Nº 1' => 'Assembleia Caminhos de Luz Nº 1',
                                 'Assembleia Flores do Pantanal Nº 1' => 'Assembleia Flores do Pantanal Nº 1',
                                 'Assembleia Biguaçu Nº 1' => 'Assembleia Biguaçu Nº 1',
+                                'Assembleia Caminhos de Luz Nº 1' => 'Assembleia Caminhos de Luz Nº 1',
                                 'Assembleia Pitágoras Nº 2' => 'Assembleia Pitágoras Nº 2',
                                 'Assembleia Filhos de Hiram Nº 3' => 'Assembleia Filhos de Hiram Nº 3',
                                 'Assembleia Acácia Nº 4' => 'Assembleia Acácia Nº 4',
@@ -155,10 +155,6 @@ class RegistrationResource extends Resource
                             ])
                             ->searchable(),
 
-                        Forms\Components\TextInput::make('participant_data.cargo')
-                            ->label('Cargo')
-                            ->maxLength(255),
-
                         Forms\Components\Select::make('participant_data.mestre_cruz')
                             ->label('Mestre da Grande Cruz das Cores')
                             ->options([
@@ -167,14 +163,14 @@ class RegistrationResource extends Resource
                             ]),
 
                         Forms\Components\Select::make('participant_data.refeicao_especial')
-                            ->label('Refeição Especial')
+                            ->label('Kit Alimentação Separado')
                             ->options([
                                 'Sim' => 'Sim',
                                 'Não' => 'Não',
                             ]),
 
                         Forms\Components\TextInput::make('participant_data.qual_refeicao_especial')
-                            ->label('Qual Refeição Especial')
+                            ->label('Qual Alergia')
                             ->maxLength(255),
                     ])
                     ->columns(1)
@@ -282,15 +278,6 @@ class RegistrationResource extends Resource
                                 return $data['tipo_inscricao'] ?? '-';
                             }),
 
-                        Infolists\Components\TextEntry::make('cargo')
-                            ->label('Cargo')
-                            ->state(function ($record) {
-                                $data = is_string($record->participant_data)
-                                    ? json_decode($record->participant_data, true)
-                                    : $record->participant_data;
-                                return $data['cargo'] ?? '-';
-                            }),
-
                         Infolists\Components\TextEntry::make('mestre_cruz')
                             ->label('Mestre da Grande Cruz das Cores')
                             ->state(function ($record) {
@@ -301,7 +288,7 @@ class RegistrationResource extends Resource
                             }),
 
                         Infolists\Components\TextEntry::make('refeicao_especial')
-                            ->label('Refeição Especial')
+                            ->label('Kit Alimentação Separado')
                             ->state(function ($record) {
                                 $data = is_string($record->participant_data)
                                     ? json_decode($record->participant_data, true)
@@ -310,7 +297,7 @@ class RegistrationResource extends Resource
                             }),
 
                         Infolists\Components\TextEntry::make('qual_refeicao_especial')
-                            ->label('Qual Refeição Especial')
+                            ->label('Qual Alergia')
                             ->state(function ($record) {
                                 $data = is_string($record->participant_data)
                                     ? json_decode($record->participant_data, true)
@@ -574,18 +561,6 @@ class RegistrationResource extends Resource
                         }
                     }),
 
-                Tables\Filters\Filter::make('cargo')
-                    ->form([
-                        Forms\Components\TextInput::make('cargo')
-                            ->label('Cargo'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['cargo'],
-                            fn (Builder $query, $cargo): Builder => $query->whereRaw("JSON_EXTRACT(participant_data, '$.cargo') LIKE ?", ["%{$cargo}%"])
-                        );
-                    }),
-
                 Tables\Filters\SelectFilter::make('mestre_cruz')
                     ->label('Mestre da Grande Cruz das Cores')
                     ->options([
@@ -599,7 +574,7 @@ class RegistrationResource extends Resource
                     }),
 
                 Tables\Filters\SelectFilter::make('refeicao_especial')
-                    ->label('Refeição Especial')
+                    ->label('Kit Alimentação Separado')
                     ->options([
                         'Sim' => 'Sim',
                         'Não' => 'Não',
@@ -637,10 +612,9 @@ class RegistrationResource extends Resource
                                 Column::make('participant_data.estado')->heading('Estado'),
                                 Column::make('participant_data.cidade')->heading('Cidade'),
                                 Column::make('participant_data.tipo_inscricao')->heading('Tipo de Inscrição'),
-                                Column::make('participant_data.cargo')->heading('Cargo'),
                                 Column::make('participant_data.mestre_cruz')->heading('Mestre da Grande Cruz das Cores'),
-                                Column::make('participant_data.refeicao_especial')->heading('Refeição Especial'),
-                                Column::make('participant_data.qual_refeicao_especial')->heading('Qual Refeição Especial'),
+                                Column::make('participant_data.refeicao_especial')->heading('Kit Alimentação Separado'),
+                                Column::make('participant_data.qual_refeicao_especial')->heading('Qual Alergia'),
                                 Column::make('package.status')
                                     ->heading('Status')
                                     ->formatStateUsing(fn (string $state): string => match ($state) {

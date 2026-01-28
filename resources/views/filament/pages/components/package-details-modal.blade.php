@@ -202,13 +202,6 @@
                                                 </div>
                                             @endif
 
-                                            @if (isset($participantData['cargo']))
-                                                <div class="col-span-2">
-                                                    <span class="font-medium">Cargo:</span>
-                                                    <span>{{ $participantData['cargo'] }}</span>
-                                                </div>
-                                            @endif
-
                                             @if (isset($participantData['mestre_cruz']))
                                                 <div class="col-span-2">
                                                     <span class="font-medium">Mestre da Grande Cruz das Cores:</span>
@@ -218,14 +211,14 @@
 
                                             @if (isset($participantData['refeicao_especial']))
                                                 <div class="col-span-2">
-                                                    <span class="font-medium">Refeição Especial:</span>
+                                                    <span class="font-medium">Kit Alimentação Separado:</span>
                                                     <span>{{ $participantData['refeicao_especial'] }}</span>
                                                 </div>
                                             @endif
 
                                             @if (isset($participantData['qual_refeicao_especial']) && $participantData['qual_refeicao_especial'])
                                                 <div class="col-span-2">
-                                                    <span class="font-medium">Qual Refeição Especial:</span>
+                                                    <span class="font-medium">Qual Alergia:</span>
                                                     <span>{{ $participantData['qual_refeicao_especial'] }}</span>
                                                 </div>
                                             @endif

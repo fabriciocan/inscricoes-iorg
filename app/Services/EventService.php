@@ -48,11 +48,32 @@ class EventService
      *
      * @param Event $event
      * @return float|null
+     * @deprecated Use getCurrentPrices() instead to get both card and PIX prices
      */
     public function getCurrentPrice(Event $event): ?float
     {
         $currentBatch = $event->getCurrentBatch();
-        
-        return $currentBatch ? (float) $currentBatch->price : null;
+
+        return $currentBatch ? (float) $currentBatch->price_pix : null;
+    }
+
+    /**
+     * Get the current prices (card and PIX) for an event based on the active payment batch.
+     *
+     * @param Event $event
+     * @return array|null Array with 'card' and 'pix' keys, or null if no active batch
+     */
+    public function getCurrentPrices(Event $event): ?array
+    {
+        $currentBatch = $event->getCurrentBatch();
+
+        if (!$currentBatch) {
+            return null;
+        }
+
+        return [
+            'card' => (float) $currentBatch->price_card,
+            'pix' => (float) $currentBatch->price_pix,
+        ];
     }
 }

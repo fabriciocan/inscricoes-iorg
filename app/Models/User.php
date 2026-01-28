@@ -59,6 +59,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'admin';
     }
 
+    public function isHotel(): bool
+    {
+        return $this->role === 'hotel';
+    }
+
     /**
      * Get the packages for the user.
      */

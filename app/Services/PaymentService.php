@@ -56,6 +56,9 @@ class PaymentService
                 throw PaymentException::invalidPaymentData('Método de pagamento inválido. Use "pix" ou "credit_card".');
             }
 
+            // Update registration prices based on payment method
+            $this->updateRegistrationPrices($package, $method);
+
             // For PIX, create direct payment instead of preference
             if ($method === 'pix') {
                 return $this->createPixPayment($package);
@@ -83,10 +86,14 @@ class PaymentService
                     'pending' => route('payment.pending', ['package' => $package->id]),
                 ],
                 'external_reference' => $package->package_number,
-                'notification_url' => route('payment.callback'),
                 'statement_descriptor' => 'INSCRICAO EVENTO',
                 'expires' => false,
             ];
+
+            // Only add notification_url in production (requires HTTPS and public URL)
+            if (app()->environment('production')) {
+                $request['notification_url'] = route('payment.callback');
+            }
 
             // Set payment methods based on SDK v3 documentation
             if ($method === 'pix') {
@@ -338,8 +345,12 @@ class PaymentService
                     'first_name' => $package->user->name,
                 ],
                 'external_reference' => $package->package_number,
-                'notification_url' => route('payment.callback'),
             ];
+
+            // Only add notification_url in production (requires HTTPS and public URL)
+            if (app()->environment('production')) {
+                $request['notification_url'] = route('payment.callback');
+            }
 
             Log::info("Creating PIX payment with request:", [
                 'package_id' => $package->id,
@@ -404,5 +415,33 @@ class PaymentService
 
             throw PaymentException::processingFailed($e->getMessage());
         }
+    }
+
+    /**
+     * Update registration prices based on the selected payment method.
+     *
+     * @param Package $package
+     * @param string $method
+     * @return void
+     */
+    protected function updateRegistrationPrices(Package $package, string $method): void
+    {
+        foreach ($package->registrations as $registration) {
+            $currentBatch = $registration->event->getCurrentBatch();
+
+            if (!$currentBatch) {
+                continue;
+            }
+
+            $newPrice = $method === 'pix' ? $currentBatch->price_pix : $currentBatch->price_card;
+
+            if ($registration->price_paid != $newPrice) {
+                $registration->update(['price_paid' => $newPrice]);
+            }
+        }
+
+        // Recalculate package total
+        $this->registrationService->calculatePackageTotal($package);
+        $package->refresh();
     }
 }

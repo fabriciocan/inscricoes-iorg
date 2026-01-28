@@ -47,12 +47,12 @@ class MyRegistrationsPage extends Page implements HasForms, HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return auth()->check() && !auth()->user()->isHotel();
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->check() && !auth()->user()->isAdmin();
+        return auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isHotel();
     }
 
     public function table(Table $table): Table

@@ -14,7 +14,8 @@ class PaymentBatch extends Model
      */
     protected $fillable = [
         'event_id',
-        'price',
+        'price_card',
+        'price_pix',
         'start_date',
         'end_date',
     ];
@@ -27,7 +28,8 @@ class PaymentBatch extends Model
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:2',
+            'price_card' => 'decimal:2',
+            'price_pix' => 'decimal:2',
             'start_date' => 'date',
             'end_date' => 'date',
         ];

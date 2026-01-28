@@ -94,7 +94,7 @@ class PaymentPage extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return auth()->check() && !auth()->user()->isHotel();
     }
 
     public function selectMethod(string $method): void
@@ -176,6 +176,23 @@ class PaymentPage extends Page
     public function getPackageTotal(): float
     {
         return $this->package ? $this->package->calculateTotal() : 0;
+    }
+
+    public function getPackageTotalForMethod(string $method): float
+    {
+        if (!$this->package) {
+            return 0;
+        }
+
+        $total = 0;
+        foreach ($this->package->registrations as $registration) {
+            $currentBatch = $registration->event->getCurrentBatch();
+            if ($currentBatch) {
+                $total += $method === 'pix' ? $currentBatch->price_pix : $currentBatch->price_card;
+            }
+        }
+
+        return $total;
     }
 
     public function getRegistrationsCount(): int

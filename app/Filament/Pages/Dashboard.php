@@ -8,8 +8,18 @@ class Dashboard extends BaseDashboard
 {
     public function mount(): void
     {
-        // Redireciona usuários não-admin para eventos disponíveis
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
+        if (!auth()->check()) {
+            return;
+        }
+
+        $user = auth()->user();
+
+        if ($user->isHotel()) {
+            $this->redirect(route('filament.admin.pages.hotel-registrations-page'), navigate: true);
+            return;
+        }
+
+        if (!$user->isAdmin()) {
             $this->redirect(route('filament.admin.pages.available-events-page'), navigate: true);
         }
     }

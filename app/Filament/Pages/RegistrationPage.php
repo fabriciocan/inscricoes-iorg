@@ -93,7 +93,7 @@ class RegistrationPage extends Page implements HasForms, HasActions
 
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return auth()->check() && !auth()->user()->isHotel();
     }
 
     protected function getFormSchema(): array
@@ -145,9 +145,9 @@ class RegistrationPage extends Page implements HasForms, HasActions
                             ->required()
                             ->placeholder('Selecione sua Assembleia...')
                             ->options([
-                                'Assembleia Caminhos de Luz Nº 1' => 'Assembleia Caminhos de Luz Nº 1',
                                 'Assembleia Flores do Pantanal Nº 1' => 'Assembleia Flores do Pantanal Nº 1',
                                 'Assembleia Biguaçu Nº 1' => 'Assembleia Biguaçu Nº 1',
+                                'Assembleia Caminho de Luz Nº 1' => 'Assembleia Caminho de Luz Nº 1',
                                 'Assembleia Pitágoras Nº 2' => 'Assembleia Pitágoras Nº 2',
                                 'Assembleia Filhos de Hiram Nº 3' => 'Assembleia Filhos de Hiram Nº 3',
                                 'Assembleia Acácia Nº 4' => 'Assembleia Acácia Nº 4',
@@ -186,7 +186,7 @@ class RegistrationPage extends Page implements HasForms, HasActions
                     ->columns(1),
 
                 Section::make('Informações de Inscrição')
-                    ->description('Tipo de inscrição e cargo')
+                    ->description('Tipo de inscrição')
                     ->schema([
                         Select::make('tipo_inscricao')
                             ->label('Tipo de Inscrição')
@@ -213,29 +213,6 @@ class RegistrationPage extends Page implements HasForms, HasActions
                             ->visible(fn ($get) => $get('tipo_inscricao') === 'Outro')
                             ->dehydrated(fn ($get) => $get('tipo_inscricao') === 'Outro'),
 
-                        Select::make('cargo')
-                            ->label('Qual seu cargo?')
-                            ->required()
-                            ->placeholder('Selecione seu cargo...')
-                            ->options([
-                                'Grande Cargo' => 'Grande Cargo',
-                                'Ilustre Preceptora' => 'Ilustre Preceptora',
-                                'Preceptora Mãe' => 'Preceptora Mãe',
-                                'Presidente do Conselho Consultivo' => 'Presidente do Conselho Consultivo',
-                                'Membro do Conselho Consultivo' => 'Membro do Conselho Consultivo',
-                                'Outros' => 'Outros',
-                            ])
-                            ->searchable()
-                            ->live(),
-
-                        TextInput::make('cargo_outro')
-                            ->label('Especifique seu cargo')
-                            ->placeholder('Digite seu cargo...')
-                            ->maxLength(255)
-                            ->required(fn ($get) => $get('cargo') === 'Outros')
-                            ->visible(fn ($get) => $get('cargo') === 'Outros')
-                            ->dehydrated(fn ($get) => $get('cargo') === 'Outros'),
-
                         Select::make('mestre_cruz')
                             ->label('É Mestre da Grande Cruz das Cores?')
                             ->required()
@@ -252,7 +229,7 @@ class RegistrationPage extends Page implements HasForms, HasActions
                     ->description('Informações adicionais importantes')
                     ->schema([
                         Select::make('refeicao_especial')
-                            ->label('Solicita refeição especial por motivo de alergia ou intolerância à glúten ou lactose?')
+                            ->label('Precisa de kit de alimentação separado, devido a alergia alimentar?')
                             ->required()
                             ->placeholder('Selecione...')
                             ->options([
@@ -262,8 +239,8 @@ class RegistrationPage extends Page implements HasForms, HasActions
                             ->live(),
 
                         TextInput::make('qual_refeicao_especial')
-                            ->label('Qual?')
-                            ->placeholder('Descreva a restrição alimentar...')
+                            ->label('Qual alergia?')
+                            ->placeholder('Descreva a alergia alimentar...')
                             ->maxLength(255)
                             ->required(fn ($get) => $get('refeicao_especial') === 'Sim')
                             ->visible(fn ($get) => $get('refeicao_especial') === 'Sim')
@@ -305,11 +282,6 @@ class RegistrationPage extends Page implements HasForms, HasActions
                 $tipoInscricao = $data['tipo_inscricao_outro'];
             }
 
-            $cargo = $data['cargo'];
-            if ($cargo === 'Outros' && isset($data['cargo_outro'])) {
-                $cargo = $data['cargo_outro'];
-            }
-
             $participantData = [
                 'cpf' => $data['cpf'],
                 'birth_date' => $data['birth_date'],
@@ -317,7 +289,6 @@ class RegistrationPage extends Page implements HasForms, HasActions
                 'estado' => $data['estado'],
                 'cidade' => $data['cidade'],
                 'tipo_inscricao' => $tipoInscricao,
-                'cargo' => $cargo,
                 'mestre_cruz' => $data['mestre_cruz'],
                 'refeicao_especial' => $data['refeicao_especial'],
                 'qual_refeicao_especial' => $data['qual_refeicao_especial'] ?? null,
@@ -446,7 +417,6 @@ class RegistrationPage extends Page implements HasForms, HasActions
             'data.estado' => 'required|string|max:100',
             'data.cidade' => 'required|string|max:100',
             'data.tipo_inscricao' => 'required|string|max:255',
-            'data.cargo' => 'required|string|max:255',
             'data.mestre_cruz' => 'required|string',
             'data.refeicao_especial' => 'required|string',
             'data.qual_refeicao_especial' => 'nullable|string|max:255',
@@ -461,9 +431,8 @@ class RegistrationPage extends Page implements HasForms, HasActions
             'data.estado.required' => 'O estado é obrigatório.',
             'data.cidade.required' => 'A cidade é obrigatória.',
             'data.tipo_inscricao.required' => 'O tipo de inscrição é obrigatório.',
-            'data.cargo.required' => 'O cargo é obrigatório.',
             'data.mestre_cruz.required' => 'Informe se é Mestre da Grande Cruz das Cores.',
-            'data.refeicao_especial.required' => 'Informe se solicita refeição especial.',
+            'data.refeicao_especial.required' => 'Informe se precisa de kit de alimentação separado.',
         ]);
 
         try {
@@ -480,11 +449,6 @@ class RegistrationPage extends Page implements HasForms, HasActions
                 $tipoInscricao = $this->data['tipo_inscricao_outro'];
             }
 
-            $cargo = $this->data['cargo'];
-            if ($cargo === 'Outros' && isset($this->data['cargo_outro'])) {
-                $cargo = $this->data['cargo_outro'];
-            }
-
             $participantData = [
                 'cpf' => $this->data['cpf'],
                 'birth_date' => $this->data['birth_date'],
@@ -492,7 +456,6 @@ class RegistrationPage extends Page implements HasForms, HasActions
                 'estado' => $this->data['estado'],
                 'cidade' => $this->data['cidade'],
                 'tipo_inscricao' => $tipoInscricao,
-                'cargo' => $cargo,
                 'mestre_cruz' => $this->data['mestre_cruz'],
                 'refeicao_especial' => $this->data['refeicao_especial'],
                 'qual_refeicao_especial' => $this->data['qual_refeicao_especial'] ?? null,
@@ -594,8 +557,35 @@ class RegistrationPage extends Page implements HasForms, HasActions
         return $eventService->getCurrentPrice($this->event);
     }
 
+    public function getCurrentPrices(): ?array
+    {
+        if (!$this->event) {
+            return null;
+        }
+
+        $eventService = app(EventService::class);
+        return $eventService->getCurrentPrices($this->event);
+    }
+
     public function getPackageTotal(): float
     {
         return $this->package ? $this->package->calculateTotal() : 0;
+    }
+
+    public function getPackageTotalForMethod(string $method): float
+    {
+        if (!$this->package) {
+            return 0;
+        }
+
+        $total = 0;
+        foreach ($this->package->registrations as $registration) {
+            $currentBatch = $registration->event->getCurrentBatch();
+            if ($currentBatch) {
+                $total += $method === 'pix' ? $currentBatch->price_pix : $currentBatch->price_card;
+            }
+        }
+
+        return $total;
     }
 }

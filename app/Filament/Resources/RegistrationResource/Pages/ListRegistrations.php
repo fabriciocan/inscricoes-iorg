@@ -94,14 +94,6 @@ class ListRegistrations extends ListRecords
                         : $record->participant_data;
                     return $data['tipo_inscricao'] ?? '';
                 }),
-            Column::make('cargo')
-                ->heading('Cargo')
-                ->getStateUsing(function ($record) {
-                    $data = is_string($record->participant_data) 
-                        ? json_decode($record->participant_data, true)
-                        : $record->participant_data;
-                    return $data['cargo'] ?? '';
-                }),
             Column::make('mestre_cruz')
                 ->heading('Mestre da Grande Cruz das Cores')
                 ->getStateUsing(function ($record) {
@@ -111,7 +103,7 @@ class ListRegistrations extends ListRecords
                     return $data['mestre_cruz'] ?? '';
                 }),
             Column::make('refeicao_especial')
-                ->heading('Refeição Especial')
+                ->heading('Kit Alimentação Separado')
                 ->getStateUsing(function ($record) {
                     $data = is_string($record->participant_data) 
                         ? json_decode($record->participant_data, true)
@@ -119,7 +111,7 @@ class ListRegistrations extends ListRecords
                     return $data['refeicao_especial'] ?? '';
                 }),
             Column::make('qual_refeicao_especial')
-                ->heading('Qual Refeição Especial')
+                ->heading('Qual Alergia')
                 ->getStateUsing(function ($record) {
                     $data = is_string($record->participant_data) 
                         ? json_decode($record->participant_data, true)
@@ -136,7 +128,7 @@ class ListRegistrations extends ListRecords
                     default => $state,
                 }),
             Column::make('price_paid')
-                ->heading('Valor Pago')
+                ->heading('Valor')
                 ->formatStateUsing(fn ($state) => 'R$ ' . number_format($state, 2, ',', '.')),
             Column::make('created_at')
                 ->heading('Data de Inscrição')

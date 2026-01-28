@@ -29,14 +29,24 @@ class PaymentBatchesRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\TextInput::make('price')
-                    ->label('Preço')
+                Forms\Components\TextInput::make('price_card')
+                    ->label('Preço Cartão')
                     ->required()
                     ->numeric()
                     ->prefix('R$')
                     ->minValue(0)
-                    ->step(0.01),
-                
+                    ->step(0.01)
+                    ->helperText('Valor para pagamento com cartão de crédito'),
+
+                Forms\Components\TextInput::make('price_pix')
+                    ->label('Preço PIX')
+                    ->required()
+                    ->numeric()
+                    ->prefix('R$')
+                    ->minValue(0)
+                    ->step(0.01)
+                    ->helperText('Valor para pagamento via PIX'),
+
                 Forms\Components\DatePicker::make('start_date')
                     ->label('Data de Início')
                     ->required()
@@ -50,36 +60,41 @@ class PaymentBatchesRelationManager extends RelationManager
                     ->displayFormat('d/m/Y')
                     ->after('start_date'),
             ])
-            ->columns(3);
+            ->columns(2);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('price')
+            ->recordTitleAttribute('price_card')
             ->columns([
-                Tables\Columns\TextColumn::make('price')
-                    ->label('Preço')
+                Tables\Columns\TextColumn::make('price_card')
+                    ->label('Preço Cartão')
                     ->money('BRL')
                     ->sortable(),
-                
+
+                Tables\Columns\TextColumn::make('price_pix')
+                    ->label('Preço PIX')
+                    ->money('BRL')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Data de Início')
                     ->date('d/m/Y')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('Data de Fim')
                     ->date('d/m/Y')
                     ->sortable(),
-                
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Ativo')
                     ->boolean()
                     ->getStateUsing(function ($record) {
                         return $record->isActive();
                     }),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Criado em')
                     ->dateTime('d/m/Y H:i')

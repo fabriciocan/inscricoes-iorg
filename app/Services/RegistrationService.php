@@ -69,7 +69,8 @@ class RegistrationService
 
         $data['package_id'] = $package->id;
         $data['event_id'] = $event->id;
-        $data['price_paid'] = $currentBatch->price;
+        // Store PIX price as default (will be recalculated based on payment method later)
+        $data['price_paid'] = $currentBatch->price_pix;
 
         $registration = Registration::create($data);
 
