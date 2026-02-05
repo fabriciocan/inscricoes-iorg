@@ -30,6 +30,8 @@ class EventLogoUpload extends Component
 
     public function upload()
     {
+        \Log::info('Upload method called', ['logo' => $this->logo ? 'exists' : 'null', 'event_id' => $this->event->id]);
+
         // Verifica se há arquivo antes de validar
         if (!$this->logo) {
             $this->error = 'Por favor, selecione um arquivo antes de fazer upload.';

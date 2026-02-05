@@ -38,6 +38,12 @@ class HotelRegistrationsPage extends Page implements HasForms, HasTable
         return 'Inscrições Confirmadas';
     }
 
+    public function getSubheading(): ?string
+    {
+        $count = $this->getFilteredTableQuery()->count();
+        return "{$count} inscrição(ões) encontrada(s)";
+    }
+
     public static function canAccess(): bool
     {
         return auth()->user()?->isHotel() ?? false;
@@ -56,9 +62,12 @@ class HotelRegistrationsPage extends Page implements HasForms, HasTable
                     ->whereHas('package', function (Builder $query) {
                         $query->where('status', 'confirmed');
                     })
-                    ->with(['event'])
             )
             ->columns([
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable(),
+
                 TextColumn::make('participant_name')
                     ->label('Nome Completo')
                     ->searchable()
@@ -79,6 +88,35 @@ class HotelRegistrationsPage extends Page implements HasForms, HasTable
                         return $query->orderByRaw("JSON_EXTRACT(participant_data, '$.birth_date') {$direction}");
                     }),
 
+                TextColumn::make('cpf_display')
+                    ->label('CPF')
+                    ->getStateUsing(function (Registration $record): string {
+                        $data = is_string($record->participant_data)
+                            ? json_decode($record->participant_data, true)
+                            : $record->participant_data;
+                        return $data['cpf'] ?? '-';
+                    })
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        $cleanSearch = preg_replace('/[^0-9]/', '', $search);
+                        return $query->where(function ($q) use ($search, $cleanSearch) {
+                            // Busca direta no texto (CPF formatado)
+                            $q->where('participant_data', 'LIKE', "%{$search}%");
+
+                            // Se digitou só números, busca também o CPF formatado
+                            if ($cleanSearch && strlen($cleanSearch) >= 3) {
+                                // Formata como XXX.XXX.XXX-XX para buscar
+                                $formatted = $cleanSearch;
+                                if (strlen($cleanSearch) >= 3) {
+                                    $formatted = substr($cleanSearch, 0, 3);
+                                    if (strlen($cleanSearch) > 3) $formatted .= '.' . substr($cleanSearch, 3, 3);
+                                    if (strlen($cleanSearch) > 6) $formatted .= '.' . substr($cleanSearch, 6, 3);
+                                    if (strlen($cleanSearch) > 9) $formatted .= '-' . substr($cleanSearch, 9, 2);
+                                }
+                                $q->orWhere('participant_data', 'LIKE', "%{$formatted}%");
+                            }
+                        });
+                    }),
+
                 TextColumn::make('assembleia_display')
                     ->label('Assembleia')
                     ->getStateUsing(function (Registration $record): string {
@@ -90,18 +128,8 @@ class HotelRegistrationsPage extends Page implements HasForms, HasTable
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query->orderByRaw("JSON_EXTRACT(participant_data, '$.assembleia') {$direction}");
                     }),
-
-                TextColumn::make('event.name')
-                    ->label('Evento')
-                    ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('event_id')
-                    ->label('Evento')
-                    ->relationship('event', 'name')
-                    ->searchable()
-                    ->preload(),
-
                 SelectFilter::make('assembleia')
                     ->label('Assembleia')
                     ->options([
@@ -133,7 +161,7 @@ class HotelRegistrationsPage extends Page implements HasForms, HasTable
                     ->searchable()
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.assembleia') = ?", [$data['value']]);
+                            $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.assembleia')) = ?", [$data['value']]);
                         }
                     }),
             ])

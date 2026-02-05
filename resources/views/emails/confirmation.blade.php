@@ -115,13 +115,6 @@
             <div class="info-row">
                 <span class="label">Valor Pago:</span> R$ {{ number_format($registration->price_paid, 2, ',', '.') }}
             </div>
-            
-            @if($registration->participant_data)
-            <div class="info-row">
-                <span class="label">Informações Adicionais:</span><br>
-                {{ $registration->participant_data }}
-            </div>
-            @endif
         </div>
         @endforeach
         

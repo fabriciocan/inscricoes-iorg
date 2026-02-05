@@ -239,7 +239,7 @@ class RegistrationPage extends Page implements HasForms, HasActions
                             ->live(),
 
                         TextInput::make('qual_refeicao_especial')
-                            ->label('Qual alergia?')
+                            ->label('Kit para qual alergia alimentar?')
                             ->placeholder('Descreva a alergia alimentar...')
                             ->maxLength(255)
                             ->required(fn ($get) => $get('refeicao_especial') === 'Sim')

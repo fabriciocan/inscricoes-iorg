@@ -52,7 +52,7 @@
         <div class="space-y-3">
             <div>
                 <input type="file"
-                       wire:model="logo"
+                       wire:model.live="logo"
                        id="logo-upload-{{ $event->id }}"
                        accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none">

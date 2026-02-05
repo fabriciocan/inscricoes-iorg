@@ -13,6 +13,12 @@ class ListRegistrations extends ListRecords
 {
     protected static string $resource = RegistrationResource::class;
 
+    public function getSubheading(): ?string
+    {
+        $count = $this->getFilteredTableQuery()->count();
+        return "{$count} inscrição(ões) encontrada(s)";
+    }
+
     protected function getHeaderActions(): array
     {
         return [

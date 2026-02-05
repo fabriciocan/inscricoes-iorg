@@ -361,13 +361,15 @@ class RegistrationResource extends Resource
                 Tables\Columns\TextColumn::make('package.package_number')
                     ->label('Pacote')
                     ->searchable()
-                    ->sortable(),
-                
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('event.name')
                     ->label('Evento')
                     ->searchable()
                     ->sortable()
-                    ->wrap(),
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 
                 Tables\Columns\TextColumn::make('participant_name')
                     ->label('Participante')
@@ -481,7 +483,7 @@ class RegistrationResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['cpf'],
-                            fn (Builder $query, $cpf): Builder => $query->whereRaw("JSON_EXTRACT(participant_data, '$.cpf') LIKE ?", ["%{$cpf}%"])
+                            fn (Builder $query, $cpf): Builder => $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.cpf')) LIKE ?", ["%{$cpf}%"])
                         );
                     }),
 
@@ -516,7 +518,7 @@ class RegistrationResource extends Resource
                     ->searchable()
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.assembleia') = ?", [$data['value']]);
+                            $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.assembleia')) = ?", [$data['value']]);
                         }
                     }),
 
@@ -528,7 +530,7 @@ class RegistrationResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['estado'],
-                            fn (Builder $query, $estado): Builder => $query->whereRaw("JSON_EXTRACT(participant_data, '$.estado') LIKE ?", ["%{$estado}%"])
+                            fn (Builder $query, $estado): Builder => $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.estado')) LIKE ?", ["%{$estado}%"])
                         );
                     }),
 
@@ -540,7 +542,7 @@ class RegistrationResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['cidade'],
-                            fn (Builder $query, $cidade): Builder => $query->whereRaw("JSON_EXTRACT(participant_data, '$.cidade') LIKE ?", ["%{$cidade}%"])
+                            fn (Builder $query, $cidade): Builder => $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.cidade')) LIKE ?", ["%{$cidade}%"])
                         );
                     }),
 
@@ -555,9 +557,10 @@ class RegistrationResource extends Resource
                         'Tio Maçom' => 'Tio Maçom',
                         'Tio não iniciado na Maçonaria' => 'Tio não iniciado na Maçonaria',
                     ])
+                    ->searchable()
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.tipo_inscricao') = ?", [$data['value']]);
+                            $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.tipo_inscricao')) = ?", [$data['value']]);
                         }
                     }),
 
@@ -569,11 +572,11 @@ class RegistrationResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.mestre_cruz') = ?", [$data['value']]);
+                            $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.mestre_cruz')) = ?", [$data['value']]);
                         }
                     }),
 
-                Tables\Filters\SelectFilter::make('refeicao_especial')
+                Tables\Filters\SelectFilter::make('kit_alimentacao')
                     ->label('Kit Alimentação Separado')
                     ->options([
                         'Sim' => 'Sim',
@@ -581,7 +584,7 @@ class RegistrationResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (isset($data['value'])) {
-                            $query->whereRaw("JSON_EXTRACT(participant_data, '$.refeicao_especial') = ?", [$data['value']]);
+                            $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(participant_data), '$.refeicao_especial')) = ?", [$data['value']]);
                         }
                     }),
             ])
